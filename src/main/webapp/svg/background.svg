@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1024" preserveAspectRatio="none">
+  <rect width="1440" height="1024" fill="#f5f6f7"/>
+
+  <!-- 斜めに伸びる波1（角度あり、やさしく動く） -->
+  <path fill="#edeef0">
+    <animate attributeName="d" dur="12s" repeatCount="indefinite"
+      values="
+        M0,240 C360,360 720,280 1080,420 C1260,500 1350,600 1440,660 L1440,1024 L0,1024 Z;
+        M0,250 C360,370 720,300 1080,440 C1260,520 1350,620 1440,680 L1440,1024 L0,1024 Z;
+        M0,240 C360,360 720,280 1080,420 C1260,500 1350,600 1440,660 L1440,1024 L0,1024 Z
+      " />
+  </path>
+
+  <!-- 斜めに伸びる波2（奥行き感、ゆっくり） -->
+  <path fill="#e6e7e9">
+    <animate attributeName="d" dur="16s" repeatCount="indefinite"
+      values="
+        M0,300 C400,500 800,480 1200,700 C1320,760 1380,800 1440,840 L1440,1024 L0,1024 Z;
+        M0,310 C400,520 800,500 1200,720 C1320,780 1380,820 1440,860 L1440,1024 L0,1024 Z;
+        M0,300 C400,500 800,480 1200,700 C1320,760 1380,800 1440,840 L1440,1024 L0,1024 Z
+      " />
+  </path>
+</svg>
