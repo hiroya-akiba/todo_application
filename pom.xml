@@ -1,0 +1,104 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>todo_application</groupId>
+  <artifactId>todo_application</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>war</packaging>
+  <properties>
+      <!-- Java 17をターゲット -->
+      <maven.compiler.source>17</maven.compiler.source>
+      <maven.compiler.target>17</maven.compiler.target>
+  </properties>
+
+  <dependencies>
+      <!-- MyBatis -->
+      <dependency>
+          <groupId>org.mybatis</groupId>
+          <artifactId>mybatis</artifactId>
+          <version>3.5.10</version>
+      </dependency>
+      
+      <!-- MyBatis-Spring -->
+      <dependency>
+          <groupId>org.mybatis</groupId>
+          <artifactId>mybatis-spring</artifactId>
+          <version>2.0.7</version>
+      </dependency>
+      
+      <!-- MySQL JDBC ドライバ -->
+      <dependency>
+          <groupId>mysql</groupId>
+          <artifactId>mysql-connector-java</artifactId>
+          <version>8.0.25</version>
+      </dependency>
+
+      <!-- Jakarta Servlet API -->
+      <dependency>
+          <groupId>jakarta.servlet</groupId>
+          <artifactId>jakarta.servlet-api</artifactId>
+          <version>5.0.0</version>
+          <scope>provided</scope>
+      </dependency>
+      
+      <!-- StringUtils -->
+      <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+          <version>3.14.0</version> <!-- ここは最新版にしてOK -->
+      </dependency>
+      
+      
+      <!-- Jakarta Mail -->
+      <dependency>
+          <groupId>com.sun.mail</groupId>
+          <artifactId>jakarta.mail</artifactId>
+          <version>2.0.1</version>
+      </dependency>
+      
+      <!-- Jakarta Activation -->
+      <dependency>
+          <groupId>com.sun.activation</groupId>
+          <artifactId>jakarta.activation</artifactId>
+          <version>2.0.1</version>
+      </dependency>
+
+  </dependencies>
+  
+  <build>
+	<!-- WARファイルの名前 -->
+	<finalName>todo_application</finalName>
+	<!-- WARファイルにする際にリソースとして認識させるディレクトリ -->
+	<resources>
+		<resource>
+			<directory>src/main/resources</directory>
+			<includes>
+				<include>**/*.xml</include>
+			</includes>
+			<filtering>false</filtering>
+		</resource>
+	</resources>
+    <plugins>
+	  <!-- WARパッケージ用のプラグイン 静的リソースのコピー元指示 -->
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>3.3.2</version> <!-- バージョンは適宜 -->
+          <configuration>
+              <warSourceDirectory>src/main/webapp</warSourceDirectory>
+              <failOnMissingWebXml>false</failOnMissingWebXml>
+          </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <release>17</release>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.2.3</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>
