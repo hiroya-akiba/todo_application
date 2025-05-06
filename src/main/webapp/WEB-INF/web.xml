@@ -21,15 +21,6 @@
         <servlet-name>default</servlet-name>
         <url-pattern>/svg/*</url-pattern>
     </servlet-mapping>
-    
-    <mime-mapping>
-        <extension>css</extension>
-        <mime-type>text/css</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>svg</extension>
-        <mime-type>image/svg+xml</mime-type>
-    </mime-mapping>
 
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
