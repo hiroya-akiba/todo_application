@@ -25,7 +25,7 @@ public class UserListServlet extends HttpServlet {
 		
 		// セッションが無い場合はログアウトページへ
 		if(session==null || session.getAttribute("user")==null) {
-			forwardPage(req, res, TodoConstant.LOGOUT_SESSION_ERROR);
+			forwardPage(req, res, TodoConstant.LOGOUT + TodoConstant.LOGOUT_SESSION_ERROR);
 			return;
 		}
 		// セッションがある場合

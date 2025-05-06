@@ -1,0 +1,36 @@
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 30px));
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.hero-section {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  animation: fadeSlideUp 2s ease-out forwards; /* ← forwards を追加 */
+  width: 100%;
+  padding: 0 2rem;
+  opacity: 0; /* ← 初期状態を透明にしておく */
+}
+
+.hero-title {
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 4rem;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.hero-subtitle {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 4rem;
+}

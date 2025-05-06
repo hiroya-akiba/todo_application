@@ -49,9 +49,26 @@ public class TodoListService {
 		String content = req.getParameter("content");
 		Date date = Date.valueOf(req.getParameter("due_date"));
 		TodoListDao dao = DaoFactory.getTodoListDao();
-		dao.insertTask(id, content, date, sqlSession);
+		try {
+			dao.insertTask(id, content, date, sqlSession);
+			httpSession.setAttribute("message", "タスクを1件登録しました。");
+		} catch(Exception e) {
+			httpSession.setAttribute("errorMessage", "タスク登録に失敗しました。問題が続く場合は管理者にお知らせください。");
+			e.printStackTrace();
+		}
 		return req;
-		
+	}
+	
+	public HttpServletRequest update(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
+		return req;
+	}
+	
+	public HttpServletRequest delete(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
+		return req;
+	}
+	
+	public HttpServletRequest updateStatus(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
+		return req;
 	}
 
 }
