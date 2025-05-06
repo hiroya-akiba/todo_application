@@ -6,12 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ログイン</title>
   <link rel="stylesheet" href="<%= request.getContextPath()%>/css/style.css" />
-  <style>
-    html, body {
-      height: 100%;
-      width: 100%;
-    }
-  </style>
+
 </head>
 <body class="login-layout">
     <!-- 左側のイラスト部分 -->
@@ -35,6 +30,13 @@
                 <p>アカウント情報を入力してログインしてください</p>
             </div>
 
+            <% Boolean isGrant = (Boolean)session.getAttribute("isGrant"); %>
+            <% if (Boolean.FALSE.equals(isGrant)) { %>
+                <div class="message error mt-2">
+                    <p>ログイン情報が間違っています</p>
+                </div>
+            <% } %>
+            
             <form action="<%= request.getContextPath()%>/login?parm=cert" method="POST" class="form">
                 <label for="userId">ユーザーID</label>
                 <input type="number" id="userId" name="userId" class="no-spin" required>
@@ -44,13 +46,6 @@
 
                 <button type="submit" class="btn">ログイン</button>
             </form>
-
-            <% Boolean isGrant = (Boolean)session.getAttribute("isGrant"); %>
-            <% if (Boolean.FALSE.equals(isGrant)) { %>
-                <div class="message error mt-2">
-                    <p>ログイン情報が間違っています</p>
-                </div>
-            <% } %>
 
             <div class="login-footer">
                 <p>アカウントをお持ちでない方は</p>
