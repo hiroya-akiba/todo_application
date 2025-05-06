@@ -25,7 +25,7 @@ public class TodoListServlet extends HttpServlet {
 		
 		// セッションが無い場合はログアウトページへ
 		if(session==null || session.getAttribute("user")==null) {
-			forwardPage(req, res, TodoConstant.LOGOUT_SESSION_ERROR);
+			forwardPage(req, res, TodoConstant.LOGOUT + TodoConstant.LOGOUT_SESSION_ERROR);
 			return;
 		}
 		// セッションがある場合
@@ -36,6 +36,21 @@ public class TodoListServlet extends HttpServlet {
 			} else if (req.getParameter("parm").equals("register")) {
 				// 新規タスク追加
 				addTask(req, res);
+			} else if (req.getParameter("parm").equals("edit")) {
+				// タスク編集
+				System.out.println(req.getParameter("ids"));
+				editTask(req, res);
+				return;
+			} else if (req.getParameter("parm").equals("delete")) {
+				// タスク削除
+				System.out.println(req.getParameter("ids"));
+				deleteTask(req, res);
+				return;
+			} else if (req.getParameter("parm").equals("status")) {
+				// ステータス更新
+				System.out.println(req.getParameter("ids"));
+				updateStatus(req, res);
+				return;
 			} else {
 				// ありえないパターン
 				initDisplay(req, res);
@@ -68,6 +83,19 @@ public class TodoListServlet extends HttpServlet {
 	 * @throws IOException
 	 */
 	public void addTaskPage(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		HttpSession httpSession = req.getSession();
+		// 成功時メッセージ
+		String message = (String) httpSession.getAttribute("message");
+		if(message!=null) {
+			req.setAttribute("message", message);
+			httpSession.removeAttribute("message");
+		}
+		// 失敗時メッセージ
+		String errorMessage = (String) httpSession.getAttribute("errorMessage");
+		if(errorMessage!=null) {
+			req.setAttribute("errorMessage", message);
+			httpSession.removeAttribute("errorMessage");
+		}
 		req.setAttribute("userId", req.getParameter("userId"));
 		includePage(req, res, TodoConstant.ADD_NEW_TASK);
 	}
@@ -83,7 +111,26 @@ public class TodoListServlet extends HttpServlet {
 		HttpSession httpSession = req.getSession(false);
 		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext()); 
 		req = service.register(req, httpSession, sqlSession);
-		res.sendRedirect(req.getContextPath() + TodoConstant.TODO_LIST);
+		sqlSession.close();
+		res.sendRedirect(req.getContextPath() + TodoConstant.TODO_LIST + TodoConstant.TODO_LIST_NEW);
+	}
+	
+	public void editTask(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		HttpSession httpSession = req.getSession(false);
+		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext()); 
+		req = service.update(req, httpSession, sqlSession);
+	}
+	
+	public void deleteTask(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		HttpSession httpSession = req.getSession(false);
+		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext()); 
+		req = service.delete(req, httpSession, sqlSession);
+	}
+	
+	public void updateStatus(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		HttpSession httpSession = req.getSession(false);
+		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext()); 
+		req = service.updateStatus(req, httpSession, sqlSession);
 	}
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException{

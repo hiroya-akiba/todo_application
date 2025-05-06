@@ -68,10 +68,18 @@ public class TodoConstant {
 	 */
 	public static final String USER_LIST = "/user_list";
 	
-	/**
-	 * セッションエラーのログアウト 
+	// parm変数一覧
+	/*
+	 * セッションエラー
 	 */
-	public static final String LOGOUT_SESSION_ERROR = "/logout?parm=session_error";
+	public static final String LOGOUT_SESSION_ERROR = "?parm=session_error";
+	
+	
+	/**
+	 * 新規タスク登録
+	 */
+	public static final String TODO_LIST_NEW = "?parm=new";
+	
 	
 	// 権限関連
 	/**

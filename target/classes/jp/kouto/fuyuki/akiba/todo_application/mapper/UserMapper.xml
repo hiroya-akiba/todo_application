@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jp.kouto.fuyuki.akiba.todo_application.mapper.UserMapper">
+     <resultMap id="userResultMap" type="jp.kouto.fuyuki.akiba.todo_application.dto.UsersDto">
+        <id property="id" column="id" />
+        <result property="username" column="username" />
+        <result property="email" column="email" />
+        <result property="password_hash" column="password_hash" />
+        <result property="role" column="role" />
+        <result property="createDate" column="create_date" />
+        <result property="updateDate" column="update_date" />
+        <result property="deletedDate" column="deleted_date" />
+    </resultMap>
+    
+    <!-- ユーザー情報取得 -->
+    <select id="getUserById" parameterType="hashmap" resultMap="userResultMap">
+        SELECT id, username, email, password_hash, role, create_date, update_date, deleted_date
+        FROM users
+        WHERE id = #{userId}
+    </select>
+    
+    <!-- 新規ユーザー挿入 -->
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (username, email, password_hash, role, create_date, update_date)
+        VALUES (#{username}, #{email}, #{password_hash}, #{role}, NOW(), NOW())
+    </insert>
+    
+    <!-- 仮ユーザー登録 -->
+    <insert id="insertTempUser" useGeneratedKeys="true" keyProperty="id">
+    	INSERT INTO temp_users (receipt_number, verify_code, username, email, password_hash, create_date)
+        VALUES (#{receipt_number}, #{verify_code}, #{username}, #{email}, #{password_hash}, NOW())
+    </insert>
+    
+    <!-- 仮登録番号検索 -->
+	<select id="getVerifyCode" parameterType="hashmap" resultType="Integer">
+		SELECT verify_code
+		FROM temp_users
+		WHERE receipt_number = #{receipt_number}
+	</select>
+	
+	<!-- 仮登録ユーザー取得 -->
+	<select id="getTempUser" parameterType="hashmap" resultType="hashmap">
+		SELECT username, email, password_hash
+		FROM temp_users
+		WHERE receipt_number = #{receipt_number}
+	</select>
+	
+	<select id="getUserList" resultMap="userResultMap">
+		SELECT * FROM users
+	</select>
+</mapper>
