@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.ibatis.session.SqlSession;
 
 import jp.kouto.fuyuki.akiba.todo_application.dto.UsersDto;
+import jp.kouto.fuyuki.akiba.todo_application.exceptions.RyzaDBException;
 
 public interface UsersDao {
 	
@@ -14,14 +15,14 @@ public interface UsersDao {
 	 * @param id ユーザーID
 	 * @return
 	 */
-	 public UsersDto getUser(long id, SqlSession session);
+	 public UsersDto getUser(long id, SqlSession session) throws RyzaDBException ;
 	 
 	 /**
 	  * ユーザーをすべて取得する
 	  * @param session
 	  * @return
 	  */
-	 public List<UsersDto> getUserList(SqlSession session) ;
+	 public List<UsersDto> getUserList(SqlSession session) throws RyzaDBException ;
 	 
 	 /**
 	  * ユーザー登録
@@ -31,7 +32,7 @@ public interface UsersDao {
 	  * @param sqlSession
 	  * @return
 	  */
-	 public Long insertUser(String username, String email, String password_hash, SqlSession sqlSession);
+	 public Long insertUser(String username, String email, String password_hash, SqlSession sqlSession) throws RyzaDBException ;
 	 
 	 /**
 	  * ユーザー仮登録
@@ -43,7 +44,7 @@ public interface UsersDao {
 	  * @param sqlSession
 	  */
 	 public void insertTempUser(int verifyCode, String receiptCode, String username,
-			 String email, String password_hash, SqlSession sqlSession);
+			 String email, String password_hash, SqlSession sqlSession) throws RyzaDBException ;
 	
 	 /**
 	  * 認証番号検索
@@ -51,7 +52,7 @@ public interface UsersDao {
 	  * @param sqlSession
 	  * @return
 	  */
-	 public int selectVerifyCode(String receiptCode, SqlSession sqlSession);
+	 public int selectVerifyCode(String receiptCode, SqlSession sqlSession) throws RyzaDBException ;
 	 
 	 /**
 	  * 一時保存ユーザー取得
@@ -59,7 +60,7 @@ public interface UsersDao {
 	  * @param sqlSession
 	  * @return
 	  */
-	 public Map<String, Object> selectTempUser(String receiptCode, SqlSession sqlSession);
+	 public Map<String, Object> selectTempUser(String receiptCode, SqlSession sqlSession) throws RyzaDBException ;
 	 
 	 /**
 	  * idで指定したユーザーを削除する
