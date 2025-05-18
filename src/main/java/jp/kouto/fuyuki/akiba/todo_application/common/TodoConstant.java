@@ -80,7 +80,6 @@ public class TodoConstant {
 	 */
 	public static final String TODO_LIST_NEW = "?parm=new";
 	
-	
 	// 権限関連
 	/**
 	 * 一般権限
@@ -97,5 +96,11 @@ public class TodoConstant {
 	 * DB登録日付型
 	 */
 	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	
+	/**
+	 * 2段階認証用メール送信時タイトル
+	 */
+	public static final String MAIL_TITLE = "認証コードのお知らせ";
+	
 	
 }

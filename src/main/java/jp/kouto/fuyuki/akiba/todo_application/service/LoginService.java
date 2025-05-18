@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jp.kouto.fuyuki.akiba.todo_application.dao.UsersDao;
 import jp.kouto.fuyuki.akiba.todo_application.dto.UsersDto;
+import jp.kouto.fuyuki.akiba.todo_application.exceptions.RyzaDBException;
 import jp.kouto.fuyuki.akiba.todo_application.util.CertificationUtil;
 import jp.kouto.fuyuki.akiba.todo_application.util.DaoFactory;
 
@@ -16,9 +17,16 @@ public class LoginService {
 		// ユーザー情報の確認
 		long id = Integer.parseInt(req.getParameter("userId"));
 		UsersDao dao = DaoFactory.getUsersDao();
-		UsersDto user = dao.getUser(id, sqlSession);
+		UsersDto user = new UsersDto();
+		try {
+			user = dao.getUser(id, sqlSession);
+		} catch(RyzaDBException e){
+			// エラーページへ飛ばす
+			e.printStackTrace();
+		}
 		// DB取得情報が無い場合
 		if(user == null) {
+			// 認証フラグをfalseに設定
 			req.setAttribute("isGlant", false);
 			return req;
 		}

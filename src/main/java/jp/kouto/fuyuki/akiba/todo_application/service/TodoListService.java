@@ -2,6 +2,7 @@ package jp.kouto.fuyuki.akiba.todo_application.service;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import jp.kouto.fuyuki.akiba.todo_application.dao.TodoListDao;
 import jp.kouto.fuyuki.akiba.todo_application.dto.TodoListDto;
 import jp.kouto.fuyuki.akiba.todo_application.dto.UsersDto;
+import jp.kouto.fuyuki.akiba.todo_application.exceptions.RyzaDBException;
 import jp.kouto.fuyuki.akiba.todo_application.util.DaoFactory;
 
 public class TodoListService {
@@ -29,7 +31,13 @@ public class TodoListService {
 		UsersDto user = (UsersDto) httpSession.getAttribute("user");
 		long id = user.getId();
 		TodoListDao dao = DaoFactory.getTodoListDao();
-		List<TodoListDto> todoList = dao.getListById(id, sqlSession);
+		List<TodoListDto> todoList = new ArrayList<>();
+		try {
+			todoList = dao.getListById(id, sqlSession);
+		} catch(RyzaDBException e) {
+			// エラーページへ飛ばす
+			e.printStackTrace();
+		}
 		req.setAttribute("todoList", todoList);
 		return req;
 	}
@@ -52,7 +60,7 @@ public class TodoListService {
 		try {
 			dao.insertTask(id, content, date, sqlSession);
 			httpSession.setAttribute("message", "タスクを1件登録しました。");
-		} catch(Exception e) {
+		} catch(RyzaDBException e) {
 			httpSession.setAttribute("errorMessage", "タスク登録に失敗しました。問題が続く場合は管理者にお知らせください。");
 			e.printStackTrace();
 		}

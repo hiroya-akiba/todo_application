@@ -2,6 +2,7 @@ package jp.kouto.fuyuki.akiba.todo_application.service;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import jp.kouto.fuyuki.akiba.todo_application.dao.TodoListDao;
 import jp.kouto.fuyuki.akiba.todo_application.dao.UsersDao;
 import jp.kouto.fuyuki.akiba.todo_application.dto.UsersDto;
+import jp.kouto.fuyuki.akiba.todo_application.exceptions.RyzaDBException;
 import jp.kouto.fuyuki.akiba.todo_application.util.DaoFactory;
 
 public class UserListService {
@@ -29,11 +31,17 @@ public class UserListService {
 		UsersDto user = (UsersDto) httpSession.getAttribute("user");
 		long id = user.getId();
 		UsersDao dao = DaoFactory.getUsersDao();
-		List<UsersDto> userList = dao.getUserList(sqlSession);
+		List<UsersDto> userList = new ArrayList<>();
+		try {
+			userList = dao.getUserList(sqlSession);
+		} catch(RyzaDBException e) {
+			// エラーページへ飛ばす
+			e.printStackTrace();
+		}
 		req.setAttribute("userList", userList);
 		return req;
 	}
-	
+
 	/**
 	 * タスク登録ロジック
 	 * @param req
@@ -49,9 +57,13 @@ public class UserListService {
 		String content = req.getParameter("content");
 		Date date = Date.valueOf(req.getParameter("due_date"));
 		TodoListDao dao = DaoFactory.getTodoListDao();
-		dao.insertTask(id, content, date, sqlSession);
+		try {
+			dao.insertTask(id, content, date, sqlSession);
+		} catch(RyzaDBException e) {
+			// エラーページへ飛ばす
+			e.printStackTrace();
+		}
 		return req;
 		
 	}
-
 }

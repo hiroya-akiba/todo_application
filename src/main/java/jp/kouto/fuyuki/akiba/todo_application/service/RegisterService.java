@@ -1,14 +1,19 @@
 package jp.kouto.fuyuki.akiba.todo_application.service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jp.kouto.fuyuki.akiba.todo_application.common.TodoConstant;
 import jp.kouto.fuyuki.akiba.todo_application.dao.UsersDao;
+import jp.kouto.fuyuki.akiba.todo_application.exceptions.EmailSenderException;
+import jp.kouto.fuyuki.akiba.todo_application.exceptions.RyzaDBException;
 import jp.kouto.fuyuki.akiba.todo_application.util.CertificationUtil;
 import jp.kouto.fuyuki.akiba.todo_application.util.DaoFactory;
+import jp.kouto.fuyuki.akiba.todo_application.util.EmailSender;
 
 public class RegisterService {
 	/**
@@ -23,12 +28,18 @@ public class RegisterService {
 		String email = (String) req.getAttribute("email");
 		String password_hash = (String) req.getAttribute("password_hash");
 		UsersDao dao = DaoFactory.getUsersDao();
-		Long registeredId = dao.insertUser(userName, email, password_hash, sqlSession);
+		Long registeredId = 0L; 
+		try {
+			registeredId = dao.insertUser(userName, email, password_hash, sqlSession);
+		} catch(RyzaDBException e) {
+			// エラーページへ飛ばす
+			e.printStackTrace();
+		}
 		req.setAttribute("userId", registeredId);
 		req.setAttribute("completeFlg", registeredId>0 ? "true" : "false");
 		return req;
 	}
-	
+
 	/**
 	 * 仮登録処理
 	 * @param req
@@ -47,12 +58,48 @@ public class RegisterService {
 		int verifyCode = CertificationUtil.createVerifyCode(); 
 		String reciptCode = CertificationUtil.createReceiptCode(); 
 		UsersDao dao = DaoFactory.getUsersDao();
-		dao.insertTempUser(verifyCode, reciptCode, userName, email, password_hash, sqlSession);
+		try {
+			dao.insertTempUser(verifyCode, reciptCode, userName, email, password_hash, sqlSession);
+		} catch(RyzaDBException e) {
+			// エラーページへ飛ばす
+			e.printStackTrace();
+		}
 		req.setAttribute("receipt_code", reciptCode);
-		
+		try {
+			EmailSender sender = new EmailSender();
+			sender.sendMail(email, TodoConstant.MAIL_TITLE, sendSuccess(verifyCode));
+		} catch(EmailSenderException e) {
+			req.setAttribute("errorMessage", sendFailure());
+		}
 		return req;
 	}
-	
+
+	/**
+	 * 成功時メッセージ
+	 * @param varifyCode
+	 * @return
+	 */
+	private String sendSuccess (int varifyCode) {
+		return """
+				以下の認証コードを入力してください：
+				
+				認証コード：""" + varifyCode
+				
+				+ """
+				
+				※このコードは10分間有効です。
+				※心当たりがない場合は、このメールを破棄してください。
+				""";
+	}
+
+	/**
+	 * 失敗時メッセージ
+	 * @return 
+	 */
+	private String sendFailure() {
+		return "メール送信に失敗しました。メールが届かない場合、お手数ですが再度登録画面より登録ください。";
+	}
+
 	/**
 	 * 2段階認証
 	 * @param req
@@ -64,8 +111,14 @@ public class RegisterService {
 		int verifyCode = Integer.parseInt(req.getParameter("authCode"));
 		String receiptCode = req.getParameter("receipt_code");
 		UsersDao dao = DaoFactory.getUsersDao();
-		Integer storedVerifyCode = dao.selectVerifyCode(receiptCode, sqlSession);
-		if(storedVerifyCode != null && storedVerifyCode==verifyCode) {
+		Integer storedVerifyCode = 0;
+		try {
+			storedVerifyCode = dao.selectVerifyCode(receiptCode, sqlSession);
+		} catch(RyzaDBException e) {
+			// エラーページへ飛ばす
+			e.printStackTrace();
+		}
+		if(storedVerifyCode != 0 && storedVerifyCode==verifyCode) {
 			req.setAttribute("MFV", true);
 			return req;
 		} else {
@@ -86,7 +139,13 @@ public class RegisterService {
 	public HttpServletRequest fetchTempData (HttpServletRequest req, SqlSession sqlSession) throws ServletException {
 		String receiptCode = req.getParameter("receipt_code");
 		UsersDao dao = DaoFactory.getUsersDao();
-		Map<String, Object> record = dao.selectTempUser(receiptCode, sqlSession);
+		Map<String, Object> record = new HashMap<>();
+		try {
+			record = dao.selectTempUser(receiptCode, sqlSession);
+		} catch(RyzaDBException e) {
+			// エラーページへ飛ばす
+			e.printStackTrace();
+		}
 		String username = (String) record.get("username");
 		String email = (String) record.get("email");
 		String password_hash = (String) record.get("password_hash");
@@ -97,4 +156,3 @@ public class RegisterService {
 	}
 }
 
- 
