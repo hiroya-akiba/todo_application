@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!-- 環境設定 -->
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC" />
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.cj.jdbc.Driver" />
+                <!-- <property name="url" value="jdbc:mysql://192.168.0.147:3306/todo_app?useSSL=false&serverTimezone=UTC" /> -->
+                <property name="url" value="jdbc:mysql://192.168.0.147:3306/todo_app?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC" />
+                <property name="username" value="admin" />
+                <property name="password" value="L@v0rF0rW0rk" />
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- マッパーの設定 -->
+    <mappers>
+        <mapper resource="jp/kouto/fuyuki/akiba/todo_application/mapper/UserMapper.xml" />
+        <mapper resource="jp/kouto/fuyuki/akiba/todo_application/mapper/TodoListMapper.xml" />
+        <!-- <mapper resource="mapper/UserMapper.xml" />
+        <mapper resource="mapper/TodoListMapper.xml" /> -->
+    </mappers>
+
+</configuration>
