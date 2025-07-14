@@ -564,11 +564,19 @@ input.no-spin[type=number] {
 }
 
 /* 規約 */
+.kiyaku-label input[type=checkbox]{
+	transform: scale(1.5); /*チェックボックスのサイズを大きく*/
+	cursor: pointer;
+	outline: none; /*チェックした時の横長の四角が出るのを防ぐ*/
+	box-shadow: none; /*上と同様*/
+}
+
 .kiyaku-label {
   display: inline-flex;
   align-items: flex-start; /* checkboxとテキストの縦位置整える */
   gap: 0.4rem;
   max-width: 100%;
+  cursor: default;
 }
 
 .kiyaku-label span {

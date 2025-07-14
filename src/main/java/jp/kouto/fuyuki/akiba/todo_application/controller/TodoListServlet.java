@@ -3,6 +3,8 @@ package jp.kouto.fuyuki.akiba.todo_application.controller;
 import java.io.IOException;
 
 import org.apache.ibatis.session.SqlSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -15,12 +17,11 @@ import jp.kouto.fuyuki.akiba.todo_application.service.TodoListService;
 import jp.kouto.fuyuki.akiba.todo_application.util.MyBatisUtil;
 
 public class TodoListServlet extends HttpServlet {
-	
+	final static Logger logger = LoggerFactory.getLogger(TopServlet.class);
 	TodoListService service = new TodoListService();
 
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		
 		HttpSession session = req.getSession(false); 
 		
 		// セッションが無い場合はログアウトページへ
@@ -69,9 +70,11 @@ public class TodoListServlet extends HttpServlet {
 	 * @throws IOException
 	 */
 	public void initDisplay(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		logger.info("initDisplay start");
 		HttpSession httpSession = req.getSession(false);
-		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext()); 
+		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext());
 		req = service.display(req, httpSession,sqlSession);
+		logger.info("initDisplay end");
 		includePage(req, res, TodoConstant.MAIN_PAGE);
 	}
 
@@ -83,6 +86,7 @@ public class TodoListServlet extends HttpServlet {
 	 * @throws IOException
 	 */
 	public void addTaskPage(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		logger.info("addTaskPage start");
 		HttpSession httpSession = req.getSession();
 		// 成功時メッセージ
 		String message = (String) httpSession.getAttribute("message");
@@ -97,6 +101,7 @@ public class TodoListServlet extends HttpServlet {
 			httpSession.removeAttribute("errorMessage");
 		}
 		req.setAttribute("userId", req.getParameter("userId"));
+		logger.info("addTaskPage end");
 		includePage(req, res, TodoConstant.ADD_NEW_TASK);
 	}
 
@@ -108,28 +113,57 @@ public class TodoListServlet extends HttpServlet {
 	 * @throws IOException
 	 */
 	public void addTask(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		logger.info("addTask start");
 		HttpSession httpSession = req.getSession(false);
 		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext()); 
 		req = service.register(req, httpSession, sqlSession);
 		sqlSession.close();
+		logger.info("addTaskPage end");
 		res.sendRedirect(req.getContextPath() + TodoConstant.TODO_LIST + TodoConstant.TODO_LIST_NEW);
 	}
 	
+	/**
+	 * タスク編集ボタン処理
+	 * @param req
+	 * @param res
+	 * @throws ServletException
+	 * @throws IOException
+	 */
 	public void editTask(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		logger.info("editTask start");
 		HttpSession httpSession = req.getSession(false);
-		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext()); 
+		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext());
+		logger.info("addTask end");
 		req = service.update(req, httpSession, sqlSession);
 	}
 	
+	/**
+	 * タスク消去処理
+	 * @param req
+	 * @param res
+	 * @throws ServletException
+	 * @throws IOException
+	 */
 	public void deleteTask(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		logger.info("deleteTask start");
 		HttpSession httpSession = req.getSession(false);
-		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext()); 
-		req = service.delete(req, httpSession, sqlSession);
+		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext());
+		req = service.logicalDelete(req, httpSession, sqlSession); // 論理削除
+		logger.info("deleteTask end");
 	}
 	
+	/**
+	 * タスク更新処理
+	 * @param req
+	 * @param res
+	 * @throws ServletException
+	 * @throws IOException
+	 */
 	public void updateStatus(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		logger.info("updateTask start");
 		HttpSession httpSession = req.getSession(false);
-		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext()); 
+		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext());
+		logger.info("updateTask end");
 		req = service.updateStatus(req, httpSession, sqlSession);
 	}
 	
