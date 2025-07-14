@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +19,9 @@ import jp.kouto.fuyuki.akiba.todo_application.exceptions.RyzaDBException;
 import jp.kouto.fuyuki.akiba.todo_application.util.DaoFactory;
 
 public class TodoListService {
+	
+	final static Logger logger = LoggerFactory.getLogger(TodoListService.class);
+	
 	/**
 	 * 画面表示ロジック
 	 * セッション情報内のユーザー情報を用いてリストをDBから選択する。
@@ -62,7 +67,7 @@ public class TodoListService {
 			httpSession.setAttribute("message", "タスクを1件登録しました。");
 		} catch(RyzaDBException e) {
 			httpSession.setAttribute("errorMessage", "タスク登録に失敗しました。問題が続く場合は管理者にお知らせください。");
-			e.printStackTrace();
+			logger.info("insert error",e);
 		}
 		return req;
 	}
@@ -71,7 +76,27 @@ public class TodoListService {
 		return req;
 	}
 	
-	public HttpServletRequest delete(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
+	/**
+	 * タスク削除ロジック
+	 * @param req
+	 * @param httpSession
+	 * @param sqlSession
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	public HttpServletRequest logicalDelete(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
+		UsersDto user = (UsersDto) httpSession.getAttribute("user");
+		long userId = user.getId();
+		String contentId = req.getParameter("ids");
+		TodoListDao dao = DaoFactory.getTodoListDao();
+		try {
+			dao.logicalDeleteTask(userId, contentId, sqlSession);
+		}  catch(RyzaDBException e) {
+			httpSession.setAttribute("errorMessage", "タスク削除に失敗しました。問題が続く場合は管理者にお知らせください。");
+			logger.info("delete error",e);
+		}
+		
 		return req;
 	}
 	

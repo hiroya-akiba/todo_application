@@ -40,17 +40,38 @@
 
             <!-- ユーザー登録フォーム -->
             <form action="<%= request.getContextPath()%>/login?parm=temporary" method="POST" class="form form-register">
-                <label for="username">ユーザー名:</label>
-                <input type="text" id="username" name="username" value="<%= request.getAttribute("username") != null ? request.getAttribute("username") : "" %>" required>
+                <label for="username">ユーザーID:</label>
+                <input type="text" 
+                        pattern="^([0-9A-Za-z]{8,30})"
+                        id="username"
+                        name="username"
+                        value="<%= request.getAttribute("username") != null ? request.getAttribute("username") : "" %>"
+                        placeholder="半角英数字8桁から30桁"
+                        required>
 
                 <label for="email">メールアドレス:</label>
-                <input type="email" id="email" name="email" value="<%= request.getAttribute("email") != null ? request.getAttribute("email") : "" %>" required>
+                <input type="email"
+                        id="email"
+                        name="email"
+                        value="<%= request.getAttribute("email") != null ? request.getAttribute("email") : "" %>"
+                        placeholder="xxx@abc.com"
+                        required>
 
                 <label for="password">パスワード:</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password"
+                        pattern="^([0-9A-Za-z]{8,16})"
+                        id="password"
+                        name="password"
+                        placeholder="半角英数字8桁から16桁"
+                        required>
 
                 <label for="confirmPassword">パスワード確認:</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                <input type="password"
+                        pattern="^([0-9A-Za-z]{8,16})"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        placeholder="同一のパスワードを入力"
+                        required>
                 
                 <fieldset>
                   <label class="kiyaku-label">

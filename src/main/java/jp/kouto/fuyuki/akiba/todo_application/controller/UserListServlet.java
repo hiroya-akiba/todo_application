@@ -3,6 +3,8 @@ package jp.kouto.fuyuki.akiba.todo_application.controller;
 import java.io.IOException;
 
 import org.apache.ibatis.session.SqlSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -15,7 +17,7 @@ import jp.kouto.fuyuki.akiba.todo_application.service.UserListService;
 import jp.kouto.fuyuki.akiba.todo_application.util.MyBatisUtil;
 
 public class UserListServlet extends HttpServlet {
-	
+	final static Logger logger = LoggerFactory.getLogger(UserListServlet.class);
 	UserListService service = new UserListService();
 
 	@Override
@@ -54,9 +56,11 @@ public class UserListServlet extends HttpServlet {
 	 * @throws IOException
 	 */
 	public void initDisplay(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		logger.info("initDisplay start");
 		HttpSession httpSession = req.getSession(false);
 		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext()); 
 		req = service.display(req, httpSession,sqlSession);
+		logger.info("initDisplay end");
 		includePage(req, res, TodoConstant.ADMIN_MAIN_PAGE);
 	}
 
@@ -68,6 +72,7 @@ public class UserListServlet extends HttpServlet {
 	 * @throws IOException
 	 */
 	public void addTaskPage(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		logger.info("Display addTaskPage");
 		req.setAttribute("userId", req.getParameter("userId"));
 		includePage(req, res, TodoConstant.ADD_NEW_TASK);
 	}

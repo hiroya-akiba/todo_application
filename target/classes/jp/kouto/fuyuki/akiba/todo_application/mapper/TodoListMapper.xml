@@ -12,18 +12,25 @@
         <result property="updateDate" column="update_date" />
         <result property="deletedDate" column="deleted_date" />
     </resultMap>
-        <!-- リスト取得 -->
+    <!-- タスクリスト取得 -->
     <select id="getTodoListByUserId" parameterType="hashmap" resultMap="todoListResultMap">
         SELECT id, user_id, content, due_date, status, create_date, update_date, deleted_date
         FROM todo_lists
-        WHERE user_id = #{userId}
+        WHERE user_id = #{userId} AND deleted_date IS NULL
         ORDER BY due_date ASC, create_date ASC
     </select>
 
-    <!-- 新規リスト挿入 -->
+    <!-- 新規タスク挿入 -->
     <insert id="insertTask" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO todo_lists (user_id, content, due_date, status, create_date, update_date)
         VALUES (#{userId}, #{content}, #{dueDate}, #{status}, NOW(), NOW())
     </insert>
+    
+    <!-- タスク削除 -->
+    <update id="logicalDeleteTask" parameterType="hashmap">
+        UPDATE todo_lists
+        SET deleted_date = NOW()
+        WHERE id = #{contentId} AND user_id = #{userId} 
+    </update>
 
 </mapper>

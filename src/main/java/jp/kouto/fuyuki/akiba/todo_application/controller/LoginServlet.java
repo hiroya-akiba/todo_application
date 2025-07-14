@@ -3,6 +3,8 @@ package jp.kouto.fuyuki.akiba.todo_application.controller;
 import java.io.IOException;
 
 import org.apache.ibatis.session.SqlSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -20,6 +22,7 @@ public class LoginServlet extends HttpServlet {
 	
 	LoginService loginService = new LoginService();
 	RegisterService registerService = new RegisterService();
+	final static Logger logger = LoggerFactory.getLogger(LoginServlet.class);
 
 	public void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 	    // HttpSessionの確認(falseでセッションがない場合は新規作成しない)
@@ -75,6 +78,7 @@ public class LoginServlet extends HttpServlet {
 	 * @throws IOException
 	 */
 	private void doCertificate(HttpServletRequest req, HttpServletResponse res, SqlSession sqlSession) throws ServletException, IOException {
+		logger.info("doCertificate start");
 		req = loginService.certificate(req, sqlSession);
 		sqlSession.close();
 		boolean isGrant = (boolean)req.getAttribute("isGlant");
@@ -82,6 +86,7 @@ public class LoginServlet extends HttpServlet {
 		session.setAttribute("isGrant", isGrant);
 		// OKならHttpSessionを作成してメイン画面へ
 		if(isGrant) {
+			logger.info("Certification succeeded");
 			UsersDto user = (UsersDto) req.getAttribute("user");
 			session.setMaxInactiveInterval(15 * 60); // セッションの有効期限を15分に設定
 			session.setAttribute("user", user); // ユーザー情報をセッションに保存
@@ -95,6 +100,7 @@ public class LoginServlet extends HttpServlet {
 				res.sendRedirect(req.getContextPath() + TodoConstant.USER_LIST);
 			}
 		} else {
+			logger.info("Certification failured");
 			// NGならログイン画面へ
 			res.sendRedirect(req.getContextPath() +TodoConstant.LOGIN_PAGE);
 		}
