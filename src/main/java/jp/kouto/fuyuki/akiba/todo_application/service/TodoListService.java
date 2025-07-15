@@ -100,6 +100,40 @@ public class TodoListService {
 		return req;
 	}
 	
+	/**
+	 * タスク編集ロジック
+	 * @param req
+	 * @param httpSession
+	 * @param sqlSession
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	public HttpServletRequest editTask(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
+		List<TodoListDto> editList = new ArrayList<>();
+		UsersDto user = (UsersDto) httpSession.getAttribute("user");
+		long userId = user.getId();
+		String contentId = req.getParameter("ids");
+		TodoListDao dao = DaoFactory.getTodoListDao();
+		try {
+			editList = dao.editTask(userId, contentId, sqlSession);
+		}  catch(RyzaDBException e) {
+			httpSession.setAttribute("errorMessage", "タスク編集に失敗しました。問題が続く場合は管理者にお知らせください。");
+			logger.info("edit error",e);
+		}
+		req.setAttribute("editList", editList);
+		return req;
+	}
+	
+	/**
+	 * ステータス更新ロジック
+	 * @param req
+	 * @param httpSession
+	 * @param sqlSession
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 */
 	public HttpServletRequest updateStatus(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
 		return req;
 	}
