@@ -43,6 +43,11 @@ public class TodoConstant {
 	 */
 	public static final String ADMIN_MAIN_PAGE = "/admin/user_list.jsp";
 	
+	/**
+	 * タスク編集ページUrl
+	 */
+	public static final String EDIT_TASK_PAGE = "/screen/edit_task.jsp";
+	
 	// サーブレットのUrl
 	/**
 	 * Todoリスト一覧

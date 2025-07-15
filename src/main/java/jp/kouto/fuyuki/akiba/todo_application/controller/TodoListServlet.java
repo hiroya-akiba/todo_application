@@ -123,21 +123,6 @@ public class TodoListServlet extends HttpServlet {
 	}
 	
 	/**
-	 * タスク編集ボタン処理
-	 * @param req
-	 * @param res
-	 * @throws ServletException
-	 * @throws IOException
-	 */
-	public void editTask(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		logger.info("editTask start");
-		HttpSession httpSession = req.getSession(false);
-		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext());
-		logger.info("addTask end");
-		req = service.update(req, httpSession, sqlSession);
-	}
-	
-	/**
 	 * タスク消去処理
 	 * @param req
 	 * @param res
@@ -153,7 +138,23 @@ public class TodoListServlet extends HttpServlet {
 	}
 	
 	/**
-	 * タスク更新処理
+	 * タスク編集ボタン処理
+	 * @param req
+	 * @param res
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	public void editTask(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		logger.info("editTask start");
+		HttpSession httpSession = req.getSession(false);
+		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext());
+		req = service.editTask(req, httpSession, sqlSession);
+		logger.info("editTask end");
+		includePage(req, res, TodoConstant.EDIT_TASK_PAGE);
+	}
+	
+	/**
+	 * ステータス更新処理
 	 * @param req
 	 * @param res
 	 * @throws ServletException
@@ -163,8 +164,8 @@ public class TodoListServlet extends HttpServlet {
 		logger.info("updateTask start");
 		HttpSession httpSession = req.getSession(false);
 		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext());
-		logger.info("updateTask end");
 		req = service.updateStatus(req, httpSession, sqlSession);
+		logger.info("updateTask end");
 	}
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException{

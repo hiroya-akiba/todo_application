@@ -72,7 +72,7 @@
                         <thead>
                             <tr>
                                 <th><input type="checkbox" id="check-all" onclick="toggleAllByState()"/></th>
-                                <th>ID <button type="button" onclick="sortTableBy(1)" class="btn">⇅</button></th>
+                                <%--<th>ID <button type="button" onclick="sortTableBy(1)" class="btn">⇅</button></th>--%>
                                 <th>内容<button type="button" onclick="sortTableBy(2)" class="btn">⇅</button></th>
                                 <th>期限日<button type="button" onclick="sortTableBy(3)" class="btn">⇅</button></th>
                                 <th>状態<button type="button" onclick="sortTableBy(4)" class="btn">⇅</button></th>
@@ -84,7 +84,7 @@
                         %>
                             <tr>
                                 <td><input type="checkbox" class="row-check" value="<%= todo.getId() %>"/></td>
-                                <td><%= todo.getId() %></td>
+                                <%-- <td><%= todo.getId() %></td> --%>
                                 <td><%= todo.getContent() %></td>
                                 <td><%= todo.getDueDate() %></td>
                                 <td class="todo-status">
@@ -237,9 +237,13 @@
          var paramStr = "parm=" + parm + "&ids=" + checkedIds.join(",");
          console.log(paramStr);
 
+         // 編集
          if (parm === "edit") {
              window.open("/todo_application/todo_list?" + paramStr, "_blank", "width=600,height=400,resizable=yes");
-         } else if (parm === "delete" || parm === "status") {
+            // 例 /todo_application/todo_list?parm=edit&ids=38
+
+         // 削除・状態確認
+         } else if (parm === "delete" || parm === "status") {ｘ
              var xhr = new XMLHttpRequest();
              xhr.open("GET", "/todo_application/todo_list?" + paramStr, true);
              xhr.onreadystatechange = function() {
