@@ -10,6 +10,7 @@ import org.apache.ibatis.session.SqlSession;
 
 import jp.kouto.fuyuki.akiba.todo_application.dao.TodoListDao;
 import jp.kouto.fuyuki.akiba.todo_application.dto.TodoListDto;
+import jp.kouto.fuyuki.akiba.todo_application.dto.UpdateTodoTaskDto;
 import jp.kouto.fuyuki.akiba.todo_application.exceptions.RyzaDBException;
 
 public class TodoListDaoImpl implements TodoListDao {
@@ -66,13 +67,27 @@ public class TodoListDaoImpl implements TodoListDao {
 	 /**
 	  * @see todo_application.src.main.java.jp.kouto.fuyuki.akiba.todo_application.dao.TodoListDao#editTask
 	  */
-	 public List<TodoListDto> editTask(long userId, List<String> contentId ,SqlSession session) throws RyzaDBException {
+	 public List<TodoListDto> fetchTask(long userId, List<String> contentId ,SqlSession session) throws RyzaDBException {
 		 try {
 			Map<String ,Object> params = new HashMap<>();
 			params.put("userId", userId);
 			params.put("contentId", contentId);
 			List<TodoListDto> resultList = session.selectList("jp.kouto.fuyuki.akiba.todo_application.mapper.TodoListMapper.editTask", params);
 			return resultList;
+		 } catch(Exception e) {
+			 throw new RyzaDBException("DB Error", e);
+		 }
+	 }
+	 
+	 public int updateTask(UpdateTodoTaskDto updateDto,SqlSession session) throws RyzaDBException {
+		 try {
+			Map<String ,Object> params = new HashMap<>();
+			params.put("userId", Long.parseLong(updateDto.getUserId()));
+			params.put("contentId", updateDto.getId());
+			params.put("content", updateDto.getContent());
+			params.put("status", updateDto.getStatus());
+			params.put("dueDate", updateDto.getDueDate());
+			return session.update("jp.kouto.fuyuki.akiba.todo_application.mapper.TodoListMapper.updateTask", params);
 		 } catch(Exception e) {
 			 throw new RyzaDBException("DB Error", e);
 		 }

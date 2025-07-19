@@ -22,7 +22,7 @@ public class JsonUtil {
 	 * @param obj
 	 * @throws IOException
 	 */
-	public void writeJson(HttpServletResponse res, Object obj) throws IOException {
+	public static void writeJson(HttpServletResponse res, Object obj) throws IOException {
 	    res.setContentType("application/json; charset=UTF-8");
 	    res.setCharacterEncoding("UTF-8");
 	    PrintWriter out = res.getWriter();

@@ -1,5 +1,6 @@
 jp\kouto\fuyuki\akiba\todo_application\util\StringUtil.class
 jp\kouto\fuyuki\akiba\todo_application\exceptions\EmailSenderException.class
+jp\kouto\fuyuki\akiba\todo_application\dto\UpdateTodoTaskDto.class
 jp\kouto\fuyuki\akiba\todo_application\dao\UsersDao.class
 jp\kouto\fuyuki\akiba\todo_application\util\EmailSender$1.class
 jp\kouto\fuyuki\akiba\todo_application\dto\TodoListDto.class
@@ -9,6 +10,7 @@ jp\kouto\fuyuki\akiba\todo_application\service\UserListService.class
 jp\kouto\fuyuki\akiba\todo_application\common\MyBatisConstant.class
 jp\kouto\fuyuki\akiba\todo_application\common\TodoConstant.class
 jp\kouto\fuyuki\akiba\todo_application\util\DaoFactory.class
+jp\kouto\fuyuki\akiba\todo_application\util\JsonUtil.class
 jp\kouto\fuyuki\akiba\todo_application\exceptions\RyzaDBException.class
 jp\kouto\fuyuki\akiba\todo_application\dao\impl\TodoListDaoImpl.class
 jp\kouto\fuyuki\akiba\todo_application\dto\UsersDto.class
