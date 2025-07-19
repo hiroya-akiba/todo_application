@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
@@ -12,12 +13,15 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jp.kouto.fuyuki.akiba.todo_application.dao.TodoListDao;
 import jp.kouto.fuyuki.akiba.todo_application.dto.TodoListDto;
+import jp.kouto.fuyuki.akiba.todo_application.dto.UpdateTodoTaskDto;
 import jp.kouto.fuyuki.akiba.todo_application.dto.UsersDto;
 import jp.kouto.fuyuki.akiba.todo_application.exceptions.RyzaDBException;
 import jp.kouto.fuyuki.akiba.todo_application.util.DaoFactory;
+import jp.kouto.fuyuki.akiba.todo_application.util.JsonUtil;
 
 public class TodoListService {
 	
@@ -33,7 +37,7 @@ public class TodoListService {
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	public HttpServletRequest display(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
+	public HttpServletRequest displayLogic(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
 		UsersDto user = (UsersDto) httpSession.getAttribute("user");
 		long id = user.getId();
 		TodoListDao dao = DaoFactory.getTodoListDao();
@@ -57,7 +61,7 @@ public class TodoListService {
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	public HttpServletRequest register(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
+	public HttpServletRequest registerLogic(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
 		UsersDto user = (UsersDto) httpSession.getAttribute("user");
 		long id = user.getId();
 		String content = req.getParameter("content");
@@ -72,11 +76,7 @@ public class TodoListService {
 		}
 		return req;
 	}
-	
-	public HttpServletRequest update(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
-		return req;
-	}
-	
+
 	/**
 	 * タスク削除ロジック
 	 * @param req
@@ -86,7 +86,7 @@ public class TodoListService {
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	public HttpServletRequest logicalDelete(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
+	public HttpServletRequest logicalDeleteLogic(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
 		UsersDto user = (UsersDto) httpSession.getAttribute("user");
 		long userId = user.getId();
 		String contentId = req.getParameter("ids");
@@ -110,16 +110,16 @@ public class TodoListService {
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	public HttpServletRequest editTask(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
+	public HttpServletRequest editTaskLogic(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
 		List<TodoListDto> editList = new ArrayList<>();
 		UsersDto user = (UsersDto) httpSession.getAttribute("user");
 		long userId = user.getId();
 		List<String> contentId = Arrays.asList(req.getParameter("ids").split(","));
 		TodoListDao dao = DaoFactory.getTodoListDao();
 		try {
-			editList = dao.editTask(userId, contentId, sqlSession);
+			editList = dao.fetchTask(userId, contentId, sqlSession);
 		}  catch(RyzaDBException e) {
-			httpSession.setAttribute("errorMessage", "タスク編集に失敗しました。問題が続く場合は管理者にお知らせください。");
+			httpSession.setAttribute("errorMessage", "タスク編集ページ遷移に失敗しました。問題が続く場合は管理者にお知らせください。");
 			logger.info("edit error",e);
 		}
 		req.setAttribute("editList", editList);
@@ -135,11 +135,34 @@ public class TodoListService {
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	public HttpServletRequest updateStatus(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
-		List<TodoListDto> editList = new ArrayList<>();
-		UsersDto user = (UsersDto) httpSession.getAttribute("user");
-		long userId = user.getId();
-		return req;
+	public void updateTaskLogic(HttpServletRequest req, HttpServletResponse res, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
+		// 更新後のDTO
+		UpdateTodoTaskDto requestDto = JsonUtil.readJson(req, UpdateTodoTaskDto.class);
+		Long userId = Long.parseLong(requestDto.getUserId());
+		List<String> contentId = Arrays.asList(requestDto.getId());
+		TodoListDao dao = DaoFactory.getTodoListDao();
+		try {
+			// 更新用DTO
+			UpdateTodoTaskDto updateDto = new UpdateTodoTaskDto();
+			List<TodoListDto> fetchedList = dao.fetchTask(userId, contentId, sqlSession);
+			if (!Objects.equals(requestDto.getContent(), fetchedList.get(0).getContent())) {
+			    updateDto.setContent(requestDto.getContent());
+			}
+			if (!Objects.equals(requestDto.getStatus(), fetchedList.get(0).getStatus())) {
+			    updateDto.setStatus(requestDto.getStatus());
+			}
+			if (!Objects.equals(requestDto.getDueDate(), fetchedList.get(0).getDueDate())) {
+			    updateDto.setDueDate(requestDto.getDueDate());
+			}
+			int result = dao.updateTask(updateDto, sqlSession);
+			
+			if (result > 0) {
+				JsonUtil.writeJson(res, );
+			}
+		} catch(RyzaDBException e) {
+			httpSession.setAttribute("errorMessage", "タスク更新に失敗しました。問題が続く場合は管理者にお知らせください。");
+			logger.info("update error",e);
+		}
 	}
 
 }

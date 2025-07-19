@@ -28,25 +28,24 @@
     <% if (taskList != null && !taskList.isEmpty()) { %>
       <% for (TodoListDto task : taskList) { %>
         <div class="card">
-          <form action="<%= request.getContextPath() %>/todo_list?parm=update" method="POST" class="form">
-            <input type="hidden" name="id" value="<%= task.getId() %>">
-            <input type="hidden" name="userId" value="<%= task.getUserId() %>">
-
+          <div class="form">
+            <input type="hidden" id="id_<%= task.getId() %>" value="<%= task.getId() %>">
+            <input type="hidden" id="userId_<%= task.getId() %>" value="<%= task.getUserId() %>">
+            
             <label for="content_<%= task.getId() %>">内容</label>
-            <input type="text" id="content_<%= task.getId() %>" name="content" value="<%= task.getContent() %>" required>
-
+            <input type="text" id="content_<%= task.getId() %>" value="<%= task.getContent() %>" required>
+            
             <label for="status_<%= task.getId() %>">ステータス</label>
-            <select id="status_<%= task.getId() %>" name="status">
+            <select id="status_<%= task.getId() %>">
               <option value="未着手" <%= "未着手".equals(task.getStatus()) ? "selected" : "" %>>未着手</option>
               <option value="進行中" <%= "進行中".equals(task.getStatus()) ? "selected" : "" %>>進行中</option>
               <option value="完了" <%= "完了".equals(task.getStatus()) ? "selected" : "" %>>完了</option>
             </select>
-
+            
             <label for="due_<%= task.getId() %>">締切日</label>
-            <input type="date" id="due_<%= task.getId() %>" name="dueDate" value="<%= task.getDueDate() %>" required>
-
-            <button type="submit">更新</button>
-          </form>
+            <input type="date" id="due_<%= task.getId() %>" value="<%= task.getDueDate() %>" required>
+            <button type="button" onclick="updateTask(<%= task.getId() %>)">更新</button>
+          </div>
         </div>
       <% } %>
     <% } else { %>
@@ -60,11 +59,13 @@
  * 更新ボタン押下処理
  */
 function updateTask(taskId) {
+  const userId = document.getElementById(`userId_${taskId}`).value;
   const content = document.getElementById(`content_${taskId}`).value;
   const status = document.getElementById(`status_${taskId}`).value;
   const dueDate = document.getElementById(`due_${taskId}`).value;
 
   const jsonData = {
+    userId: userId,
     id: taskId,
     content: content,
     status: status,

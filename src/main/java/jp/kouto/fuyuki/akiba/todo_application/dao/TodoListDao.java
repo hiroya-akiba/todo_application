@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 
 import jp.kouto.fuyuki.akiba.todo_application.dto.TodoListDto;
+import jp.kouto.fuyuki.akiba.todo_application.dto.UpdateTodoTaskDto;
 import jp.kouto.fuyuki.akiba.todo_application.exceptions.RyzaDBException;
 
 public interface TodoListDao {
@@ -41,12 +42,19 @@ public interface TodoListDao {
 	
 	
 	/**
-	 * タスクを編集する
+	 * タスクを取得する
 	 * @param userId
 	 * @param contentId
 	 * @param session
 	 * @throws RyzaDBException
 	 */
-	public List<TodoListDto> editTask(long userId, List<String> contentId, SqlSession session) throws RyzaDBException;
+	public List<TodoListDto> fetchTask(long userId, List<String> contentId, SqlSession session) throws RyzaDBException;
 	
+	/**
+	 * タスクを編集する
+	 * @param requestDto
+	 * @return
+	 * @throws RyzaDBException
+	 */
+	public int updateTask(UpdateTodoTaskDto requestDto, SqlSession session) throws RyzaDBException;
 }
