@@ -1,10 +1,13 @@
 package jp.kouto.fuyuki.akiba.todo_application.controller;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -15,6 +18,7 @@ import jakarta.servlet.http.HttpSession;
 import jp.kouto.fuyuki.akiba.todo_application.common.TodoConstant;
 import jp.kouto.fuyuki.akiba.todo_application.service.TodoListService;
 import jp.kouto.fuyuki.akiba.todo_application.util.MyBatisUtil;
+
 
 public class TodoListServlet extends HttpServlet {
 	final static Logger logger = LoggerFactory.getLogger(TopServlet.class);
@@ -39,18 +43,15 @@ public class TodoListServlet extends HttpServlet {
 				addTask(req, res);
 			} else if (req.getParameter("parm").equals("edit")) {
 				// タスク編集
-				System.out.println(req.getParameter("ids"));
 				editTask(req, res);
 				return;
 			} else if (req.getParameter("parm").equals("delete")) {
 				// タスク削除
-				System.out.println(req.getParameter("ids"));
 				deleteTask(req, res);
 				return;
-			} else if (req.getParameter("parm").equals("status")) {
+			} else if (req.getParameter("parm").equals("update")) {
 				// ステータス更新
-				System.out.println(req.getParameter("ids"));
-				updateStatus(req, res);
+				updateTask(req, res);
 				return;
 			} else {
 				// ありえないパターン
@@ -123,7 +124,7 @@ public class TodoListServlet extends HttpServlet {
 	}
 	
 	/**
-	 * タスク消去処理
+	 * タスク消去ボタン処理
 	 * @param req
 	 * @param res
 	 * @throws ServletException
@@ -138,7 +139,7 @@ public class TodoListServlet extends HttpServlet {
 	}
 	
 	/**
-	 * タスク編集ボタン処理
+	 * タスク編集ページ表示
 	 * @param req
 	 * @param res
 	 * @throws ServletException
@@ -154,33 +155,67 @@ public class TodoListServlet extends HttpServlet {
 	}
 	
 	/**
-	 * ステータス更新処理
+	 * タスク更新処理
 	 * @param req
 	 * @param res
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	public void updateStatus(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+	public void updateTask(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 		logger.info("updateTask start");
 		HttpSession httpSession = req.getSession(false);
 		SqlSession sqlSession = MyBatisUtil.getSqlSession(req, getServletContext());
 		req = service.updateStatus(req, httpSession, sqlSession);
 		logger.info("updateTask end");
+		
 	}
 	
+	/**
+	 * Getアクセス時のデフォルトメソッド
+	 */
 	public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException{
 		doPost(req, res);
 	}
 
+	/**
+	 * インクルード
+	 * @param req
+	 * @param res
+	 * @param page
+	 * @throws ServletException
+	 * @throws IOException
+	 */
 	public void includePage(HttpServletRequest req, HttpServletResponse res, String page) throws ServletException, IOException {
 		RequestDispatcher dispatcher =  req.getRequestDispatcher(page);
 		dispatcher.include(req, res);
 	}
 	
+	/**
+	 * フォワード
+	 * @param req
+	 * @param res
+	 * @param page
+	 * @throws ServletException
+	 * @throws IOException
+	 */
 	public void forwardPage(HttpServletRequest req, HttpServletResponse res, String page) throws ServletException, IOException {
 		RequestDispatcher dispatcher =  req.getRequestDispatcher(page);
 		dispatcher.forward(req, res);
 	}
 	
+	/**
+	 * Jsonレスポンス
+	 * @param res
+	 * @param obj
+	 * @throws IOException
+	 */
+	public void writeJson(HttpServletResponse res, Object obj) throws IOException {
+	    res.setContentType("application/json; charset=UTF-8");
+	    res.setCharacterEncoding("UTF-8");
+	    PrintWriter out = res.getWriter();
+	    String json = new Gson().toJson(obj);
+	    out.print(json);
+	    out.flush();
+	}
 
 }

@@ -3,6 +3,7 @@ package jp.kouto.fuyuki.akiba.todo_application.service;
 import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
@@ -113,7 +114,7 @@ public class TodoListService {
 		List<TodoListDto> editList = new ArrayList<>();
 		UsersDto user = (UsersDto) httpSession.getAttribute("user");
 		long userId = user.getId();
-		String contentId = req.getParameter("ids");
+		List<String> contentId = Arrays.asList(req.getParameter("ids").split(","));
 		TodoListDao dao = DaoFactory.getTodoListDao();
 		try {
 			editList = dao.editTask(userId, contentId, sqlSession);
@@ -135,6 +136,9 @@ public class TodoListService {
 	 * @throws IOException
 	 */
 	public HttpServletRequest updateStatus(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
+		List<TodoListDto> editList = new ArrayList<>();
+		UsersDto user = (UsersDto) httpSession.getAttribute("user");
+		long userId = user.getId();
 		return req;
 	}
 
