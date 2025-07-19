@@ -47,6 +47,6 @@ public interface TodoListDao {
 	 * @param session
 	 * @throws RyzaDBException
 	 */
-	public List<TodoListDto> editTask(long userId, String contentId, SqlSession session) throws RyzaDBException;
+	public List<TodoListDto> editTask(long userId, List<String> contentId, SqlSession session) throws RyzaDBException;
 	
 }

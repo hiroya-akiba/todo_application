@@ -243,7 +243,7 @@
             // 例 /todo_application/todo_list?parm=edit&ids=38
 
          // 削除・状態確認
-         } else if (parm === "delete" || parm === "status") {ｘ
+         } else if (parm === "delete" || parm === "status") {
              var xhr = new XMLHttpRequest();
              xhr.open("GET", "/todo_application/todo_list?" + paramStr, true);
              xhr.onreadystatechange = function() {

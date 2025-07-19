@@ -36,7 +36,12 @@
     <select id="editTask" parameterType="hashmap" resultMap="todoListResultMap">
         SELECT id, user_id, content, due_date, status, create_date, update_date, deleted_date
         FROM todo_lists
-        WHERE user_id = #{userId} AND deleted_date IS NULL
+        WHERE user_id = #{userId}
+        AND id IN
+        <foreach collection="contentId" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND deleted_date IS NULL
         ORDER BY due_date ASC, create_date ASC
     </select>
 

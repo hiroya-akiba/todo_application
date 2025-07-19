@@ -66,7 +66,7 @@ public class TodoListDaoImpl implements TodoListDao {
 	 /**
 	  * @see todo_application.src.main.java.jp.kouto.fuyuki.akiba.todo_application.dao.TodoListDao#editTask
 	  */
-	 public List<TodoListDto> editTask(long userId, String contentId ,SqlSession session) throws RyzaDBException {
+	 public List<TodoListDto> editTask(long userId, List<String> contentId ,SqlSession session) throws RyzaDBException {
 		 try {
 			Map<String ,Object> params = new HashMap<>();
 			params.put("userId", userId);

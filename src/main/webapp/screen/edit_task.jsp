@@ -24,7 +24,7 @@
 <body>
   <div class="edit-container">
     <h2 class="text-bold">タスク編集</h2>
-
+    <div id="messageBox" class="message mt-2" style="display: none;"></div>
     <% if (taskList != null && !taskList.isEmpty()) { %>
       <% for (TodoListDto task : taskList) { %>
         <div class="card">
@@ -54,4 +54,64 @@
     <% } %>
   </div>
 </body>
+<script>
+
+/**
+ * 更新ボタン押下処理
+ */
+function updateTask(taskId) {
+  const content = document.getElementById(`content_${taskId}`).value;
+  const status = document.getElementById(`status_${taskId}`).value;
+  const dueDate = document.getElementById(`due_${taskId}`).value;
+
+  const jsonData = {
+    id: taskId,
+    content: content,
+    status: status,
+    dueDate: dueDate
+  };
+
+  fetch('<%= request.getContextPath() %>/todo_list?parm=update', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json' 
+    },
+    body: JSON.stringify(jsonData)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('通信失敗');
+    }
+    return response.json(); // サーバーからJSON返すなら
+  })
+  .then(data => {
+    showMessage('タスクを1件更新しました。', true);
+  }
+  .catch(err => {
+    showMessage('更新に失敗しました', false);
+  });
+}
+
+/**
+ * 更新処理後メッセージ出力処理
+ */
+function showMessage(text, isSuccess = true) {
+  const box = document.getElementById('messageBox');
+  box.textContent = text;
+
+  // 一旦クラスをクリア
+  box.className = 'message mt-2';
+
+  // 成功 or エラー用クラスを追加
+  box.classList.add(isSuccess ? 'success' : 'error');
+
+  // 表示する
+  box.style.display = 'block';
+
+  // 数秒後に消すなら下記を追加（任意）
+  setTimeout(() => {
+    box.style.display = 'none';
+  }, 3000);
+}
+</script>
 </html>
