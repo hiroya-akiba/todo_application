@@ -1,3 +1,5 @@
 /build/
 /target/
 mail.properties
+run_scp_gui.bat
+scp_gui.py
