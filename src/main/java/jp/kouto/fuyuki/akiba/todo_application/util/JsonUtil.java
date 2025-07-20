@@ -26,9 +26,14 @@ public class JsonUtil {
 	    res.setContentType("application/json; charset=UTF-8");
 	    res.setCharacterEncoding("UTF-8");
 	    PrintWriter out = res.getWriter();
-	    String json = new Gson().toJson(obj);
-	    out.print(json);
-	    out.flush();
+	    String json = "";
+	    try {
+	    	json = new Gson().toJson(obj);
+		    out.print(json);
+		    out.flush();
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	    }
 	}
 
 	/**

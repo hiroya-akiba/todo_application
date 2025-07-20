@@ -44,5 +44,14 @@
         AND deleted_date IS NULL
         ORDER BY due_date ASC, create_date ASC
     </select>
-
+    <update id="updateTask" parameterType="hashmap">
+        UPDATE todo_lists
+        <set>
+          <if test="content != null"> content = #{content}, </if>
+          <if test="status != null"> status = #{status}, </if>
+          <if test="dueDate != null"> due_date = #{dueDate}, </if>
+          update_date = NOW()
+        </set>
+        WHERE user_id = #{userId} AND id = #{contentId}
+    </update>
 </mapper>

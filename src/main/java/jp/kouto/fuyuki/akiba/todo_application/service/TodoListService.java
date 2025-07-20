@@ -2,6 +2,7 @@ package jp.kouto.fuyuki.akiba.todo_application.service;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,9 +17,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jp.kouto.fuyuki.akiba.todo_application.dao.TodoListDao;
+import jp.kouto.fuyuki.akiba.todo_application.dto.ApiResponseDto;
 import jp.kouto.fuyuki.akiba.todo_application.dto.TodoListDto;
+import jp.kouto.fuyuki.akiba.todo_application.dto.UpdateResultDto;
 import jp.kouto.fuyuki.akiba.todo_application.dto.UpdateTodoTaskDto;
 import jp.kouto.fuyuki.akiba.todo_application.dto.UsersDto;
+import jp.kouto.fuyuki.akiba.todo_application.enums.ApiResult;
 import jp.kouto.fuyuki.akiba.todo_application.exceptions.RyzaDBException;
 import jp.kouto.fuyuki.akiba.todo_application.util.DaoFactory;
 import jp.kouto.fuyuki.akiba.todo_application.util.JsonUtil;
@@ -136,28 +140,46 @@ public class TodoListService {
 	 * @throws IOException
 	 */
 	public void updateTaskLogic(HttpServletRequest req, HttpServletResponse res, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
-		// 更新後のDTO
+		// リクエストで取得するDTO
 		UpdateTodoTaskDto requestDto = JsonUtil.readJson(req, UpdateTodoTaskDto.class);
 		Long userId = Long.parseLong(requestDto.getUserId());
-		List<String> contentId = Arrays.asList(requestDto.getId());
+		List<String> contentId = Arrays.asList(requestDto.getId().toString().trim());
 		TodoListDao dao = DaoFactory.getTodoListDao();
 		try {
-			// 更新用DTO
+			// 更新用マッパーDTO
 			UpdateTodoTaskDto updateDto = new UpdateTodoTaskDto();
 			List<TodoListDto> fetchedList = dao.fetchTask(userId, contentId, sqlSession);
+			
+			// 変更があった項目だけを更新する
+			boolean changed=false;
 			if (!Objects.equals(requestDto.getContent(), fetchedList.get(0).getContent())) {
 			    updateDto.setContent(requestDto.getContent());
+			    changed=true;
 			}
 			if (!Objects.equals(requestDto.getStatus(), fetchedList.get(0).getStatus())) {
 			    updateDto.setStatus(requestDto.getStatus());
+			    changed=true;
 			}
 			if (!Objects.equals(requestDto.getDueDate(), fetchedList.get(0).getDueDate())) {
 			    updateDto.setDueDate(requestDto.getDueDate());
+			    changed=true;
 			}
-			int result = dao.updateTask(updateDto, sqlSession);
+			// 変更があればSQL実行
+			int result = 0;
+			if(changed) {
+				updateDto.setUserId(userId.toString());
+				updateDto.setId(contentId.get(0));
+				result = dao.updateTask(updateDto, sqlSession);
+			}
 			
 			if (result > 0) {
-				JsonUtil.writeJson(res, );
+				UpdateResultDto updateResult = new UpdateResultDto(true, LocalDateTime.now().toString());
+				ApiResponseDto<UpdateResultDto> responseData = ApiResponseDto.<UpdateResultDto>builder()
+						.status(200)
+						.result(ApiResult.OK)
+						.data(updateResult)
+						.build();
+				JsonUtil.writeJson(res, responseData);
 			}
 		} catch(RyzaDBException e) {
 			httpSession.setAttribute("errorMessage", "タスク更新に失敗しました。問題が続く場合は管理者にお知らせください。");

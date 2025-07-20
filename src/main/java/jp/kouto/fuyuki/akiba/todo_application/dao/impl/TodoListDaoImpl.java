@@ -87,7 +87,9 @@ public class TodoListDaoImpl implements TodoListDao {
 			params.put("content", updateDto.getContent());
 			params.put("status", updateDto.getStatus());
 			params.put("dueDate", updateDto.getDueDate());
-			return session.update("jp.kouto.fuyuki.akiba.todo_application.mapper.TodoListMapper.updateTask", params);
+			int result = session.update("jp.kouto.fuyuki.akiba.todo_application.mapper.TodoListMapper.updateTask", params);
+			session.commit();
+			return result;
 		 } catch(Exception e) {
 			 throw new RyzaDBException("DB Error", e);
 		 }

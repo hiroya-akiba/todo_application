@@ -179,8 +179,8 @@ public class TodoListServlet extends HttpServlet {
 			SqlSession sqlSession) throws ServletException, IOException {
 		logger.info("updateTask start");
 		service.updateTaskLogic(req, res, httpSession, sqlSession);
+		sqlSession.close();
 		logger.info("updateTask end");
-
 	}
 
 	/**

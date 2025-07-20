@@ -24,9 +24,9 @@
 <body>
   <div class="edit-container">
     <h2 class="text-bold">タスク編集</h2>
-    <div id="messageBox" class="message mt-2" style="display: none;"></div>
     <% if (taskList != null && !taskList.isEmpty()) { %>
       <% for (TodoListDto task : taskList) { %>
+        <div id="messageBox" class="message mt-2" style="display: none;"></div>
         <div class="card">
           <div class="form">
             <input type="hidden" id="id_<%= task.getId() %>" value="<%= task.getId() %>">
@@ -59,10 +59,15 @@
  * 更新ボタン押下処理
  */
 function updateTask(taskId) {
-  const userId = document.getElementById(`userId_${taskId}`).value;
-  const content = document.getElementById(`content_${taskId}`).value;
-  const status = document.getElementById(`status_${taskId}`).value;
-  const dueDate = document.getElementById(`due_${taskId}`).value;
+  console.log("taskId:", taskId);
+  const userId = document.getElementById("userId_" + taskId).value;
+  console.log("userId:", userId);
+  const content = document.getElementById("content_"+taskId).value;
+  console.log("content:", content);
+  const status = document.getElementById("status_"+taskId).value;
+  console.log("status:", status);
+  const dueDate = document.getElementById("due_"+taskId).value;
+  console.log("dueDate:", dueDate);
 
   const jsonData = {
     userId: userId,
@@ -87,12 +92,11 @@ function updateTask(taskId) {
   })
   .then(data => {
     showMessage('タスクを1件更新しました。', true);
-  }
+  })
   .catch(err => {
     showMessage('更新に失敗しました', false);
   });
 }
-
 /**
  * 更新処理後メッセージ出力処理
  */
