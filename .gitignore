@@ -1,5 +1,6 @@
 /build/
 /target/
 mail.properties
+mybatis-config.xml
 run_scp_gui.bat
 scp_gui.py
