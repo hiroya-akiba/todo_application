@@ -2,6 +2,8 @@
     pageEncoding="UTF-8"%>
 <%@ page import="jp.kouto.fuyuki.akiba.todo_application.dto.UsersDto" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Arrays" %>
+<%@ page import="java.util.stream.Collectors" %>
 <%@ page import="jp.kouto.fuyuki.akiba.todo_application.dto.TodoListDto" %>
 <!DOCTYPE html>
 <html>
@@ -29,7 +31,9 @@
             <div class="card">
                 <h1 class="card-title"><%= user.getUsername() %>のToDoリスト</h1>
                     <div class="card-content">
-                    
+                    <%
+                        List<TodoListDto> todoList = (List<TodoListDto>) request.getAttribute("todoList");
+                    %>
                         <form action="<%= request.getContextPath()%>/todo_list?parm=new" method="POST" class="form">
                             <input type="hidden" id="userId" name="userId" value="<%= user.getId() %>">
                             <button type="submit" class="btn">新規タスク追加</button>
@@ -56,16 +60,18 @@
                                 </svg>
                             </button>
                             
-                            <!-- ステータス一括変更 -->
-                            <button title="ステータス変更" class="action-icon"  onclick="submitChecked('status')">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M2 12.5a.5.5 0 0 1 .5-.5H13a.5.5 0 0 1 0 1H2.5a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5H13a.5.5 0 0 1 0 1H2.5a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5H13a.5.5 0 0 1 0 1H2.5a.5.5 0 0 1-.5-.5z"/>
-                                </svg>
+                            <!-- ステータス一括更新 -->
+                            <%
+                                String idsArgs = todoList.stream()
+                                    .map(s -> "'" + s.getId() + "'")
+                                    .collect(Collectors.joining(", "));
+                            %>
+                            <button title="ステータス更新" class="action-icon"  onclick="submitChecked('status', <%=idsArgs%>)">
+                                <img src="<%= request.getContextPath()%>/svg/update.svg" width="14px" height="14px">
                             </button>
                         </div>
                     </table>
                     <%
-                        List<TodoListDto> todoList = (List<TodoListDto>) request.getAttribute("todoList");
                         if (todoList != null && !todoList.isEmpty()) {
                     %>
                     <table id="todo-table" border="1">
@@ -73,9 +79,9 @@
                             <tr>
                                 <th><input type="checkbox" id="check-all" onclick="toggleAllByState()"/></th>
                                 <%--<th>ID <button type="button" onclick="sortTableBy(1)" class="btn">⇅</button></th>--%>
-                                <th>内容<button type="button" onclick="sortTableBy(2)" class="btn">⇅</button></th>
-                                <th>期限日<button type="button" onclick="sortTableBy(3)" class="btn">⇅</button></th>
-                                <th>状態<button type="button" onclick="sortTableBy(4)" class="btn">⇅</button></th>
+                                <th>内容<button type="button" onclick="sortTableBy(1)" class="btn">⇅</button></th>
+                                <th>期限日<button type="button" onclick="sortTableBy(2)" class="btn">⇅</button></th>
+                                <th>状態<button type="button" onclick="sortTableBy(3)" class="btn">⇅</button></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -149,8 +155,8 @@
       const isAsc = sortState[colIndex];
 
       rows.sort((a, b) => {
-        let valA = a.cells[colIndex].textContent.trim();
-        let valB = b.cells[colIndex].textContent.trim();
+        let valA = a.cells[colIndex].innerText.trim();
+        let valB = b.cells[colIndex].innerText.trim();
 
         const isDateA = /^\d{4}-\d{2}-\d{2}$/.test(valA);
         const isDateB = /^\d{4}-\d{2}-\d{2}$/.test(valB);
@@ -218,6 +224,9 @@
 
     /**
     * アイコン押下時のSubmit
+    * ・編集ボタン: 編集ページへ遷移してチェック付けたタスクを表示
+    * ・削除ボタン：削除して表からレコード消す
+    * ・ステータス確認ボタン：現在のタスクの状態に更新する
     */
     function submitChecked(parm, ...updateTaskIds) {
          console.log(parm);
@@ -263,20 +272,16 @@
                } else if (parm === "status") {
                  // ステータス更新：レスポンスを受け取ってDOM反映
                  try {
-                   console.log(xhr.responseText);
                    const response = JSON.parse(xhr.responseText);
                    
                    if (response.status === 200 && response.result === "OK") {
                      const items = response.data.items;
-                     console.log(items);
-
+                     
                      items.forEach(function (task) {
                        const id = task.id;
-                       console.log(id);
                        const contentTd = document.getElementById("content-" + id);
                        const dueDateTd = document.getElementById("dueDate-" + id);
                        const statusSpan = document.getElementById("status-" + id);
-                       console.log(contentTd);
                        if (contentTd) contentTd.innerText = task.content;
                        if (dueDateTd) dueDateTd.innerText = task.dueDate;
                        if (statusSpan) statusSpan.innerText = task.status;
