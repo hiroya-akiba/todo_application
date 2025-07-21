@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jp.kouto.fuyuki.akiba.todo_application.dao.TodoListDao;
 import jp.kouto.fuyuki.akiba.todo_application.dto.ApiResponseDto;
+import jp.kouto.fuyuki.akiba.todo_application.dto.SelectResultDto;
 import jp.kouto.fuyuki.akiba.todo_application.dto.TodoListDto;
 import jp.kouto.fuyuki.akiba.todo_application.dto.UpdateResultDto;
 import jp.kouto.fuyuki.akiba.todo_application.dto.UpdateTodoTaskDto;
@@ -106,7 +107,7 @@ public class TodoListService {
 	}
 	
 	/**
-	 * タスク編集ロジック
+	 * 指定タスク取得ロジック
 	 * @param req
 	 * @param httpSession
 	 * @param sqlSession
@@ -114,7 +115,7 @@ public class TodoListService {
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	public HttpServletRequest editTaskLogic(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
+	public HttpServletRequest fetchTaskLogic(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
 		List<TodoListDto> editList = new ArrayList<>();
 		UsersDto user = (UsersDto) httpSession.getAttribute("user");
 		long userId = user.getId();
@@ -140,7 +141,7 @@ public class TodoListService {
 	 * @throws IOException
 	 */
 	public void updateTaskLogic(HttpServletRequest req, HttpServletResponse res, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
-		// リクエストで取得するDTO
+		// リクエストDTO
 		UpdateTodoTaskDto requestDto = JsonUtil.readJson(req, UpdateTodoTaskDto.class);
 		Long userId = Long.parseLong(requestDto.getUserId());
 		List<String> contentId = Arrays.asList(requestDto.getId().toString().trim());
@@ -186,5 +187,26 @@ public class TodoListService {
 			logger.info("update error",e);
 		}
 	}
-
+	
+	/**
+	 * タスク送信処理
+	 * @param req
+	 * @param res
+	 * @param httpSession
+	 * @param sqlSession
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	@SuppressWarnings("unchecked")
+	public void sendTaskLogic(HttpServletRequest req, HttpServletResponse res, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
+		List<TodoListDto> list = (List<TodoListDto>) req.getAttribute("editList");
+		SelectResultDto<TodoListDto> selectResult = new SelectResultDto<TodoListDto>(list, list.size());
+		ApiResponseDto<SelectResultDto<TodoListDto>> responseData = 
+				ApiResponseDto.<SelectResultDto<TodoListDto> >builder()
+				.status(200)
+				.result(ApiResult.OK)
+				.data(selectResult)
+				.build();
+		JsonUtil.writeJson(res, responseData);
+	}
 }

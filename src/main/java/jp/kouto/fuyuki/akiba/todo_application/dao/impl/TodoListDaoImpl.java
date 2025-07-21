@@ -72,7 +72,7 @@ public class TodoListDaoImpl implements TodoListDao {
 			Map<String ,Object> params = new HashMap<>();
 			params.put("userId", userId);
 			params.put("contentId", contentId);
-			List<TodoListDto> resultList = session.selectList("jp.kouto.fuyuki.akiba.todo_application.mapper.TodoListMapper.editTask", params);
+			List<TodoListDto> resultList = session.selectList("jp.kouto.fuyuki.akiba.todo_application.mapper.TodoListMapper.fetchTask", params);
 			return resultList;
 		 } catch(Exception e) {
 			 throw new RyzaDBException("DB Error", e);

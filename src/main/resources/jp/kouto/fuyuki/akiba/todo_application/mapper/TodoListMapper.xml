@@ -33,7 +33,8 @@
         WHERE id = #{contentId} AND user_id = #{userId} 
     </update>
     
-    <select id="editTask" parameterType="hashmap" resultMap="todoListResultMap">
+    <!-- 指定のタスクを取得する -->
+    <select id="fetchTask" parameterType="hashmap" resultMap="todoListResultMap">
         SELECT id, user_id, content, due_date, status, create_date, update_date, deleted_date
         FROM todo_lists
         WHERE user_id = #{userId}
@@ -44,6 +45,8 @@
         AND deleted_date IS NULL
         ORDER BY due_date ASC, create_date ASC
     </select>
+    
+    <!-- タスクを更新する -->
     <update id="updateTask" parameterType="hashmap">
         UPDATE todo_lists
         <set>

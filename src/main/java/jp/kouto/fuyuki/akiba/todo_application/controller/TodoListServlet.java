@@ -46,9 +46,13 @@ public class TodoListServlet extends HttpServlet {
 				deleteTask(req, res, httpSession, sqlSession);
 				return;
 			} else if (req.getParameter("parm").equals("update")) {
-				// ステータス更新
+				// タスク更新 (API)
 				updateTask(req, res, httpSession, sqlSession);
 				return;
+			} else if (req.getParameter("parm").equals("status")) {
+				// ステータス確認 (API)
+				confirmStatus(req, res, httpSession, sqlSession);
+				return; 
 			} else {
 				// ありえないパターン
 				initDisplay(req, res, httpSession, sqlSession);
@@ -159,14 +163,14 @@ public class TodoListServlet extends HttpServlet {
 			HttpSession httpSession,
 			SqlSession sqlSession) throws ServletException, IOException {
 		logger.info("editTask start");
-		req = service.editTaskLogic(req, httpSession, sqlSession);
+		req = service.fetchTaskLogic(req, httpSession, sqlSession);
 		sqlSession.close();
 		logger.info("editTask end");
 		includePage(req, res, TodoConstant.EDIT_TASK_PAGE);
 	}
 
 	/**
-	 * タスク更新処理
+	 * タスク更新処理 (API)
 	 * @param req
 	 * @param res
 	 * @throws ServletException
@@ -181,6 +185,27 @@ public class TodoListServlet extends HttpServlet {
 		service.updateTaskLogic(req, res, httpSession, sqlSession);
 		sqlSession.close();
 		logger.info("updateTask end");
+	}
+	
+	/**
+	 * ステータス確認処理 (API)
+	 * @param req
+	 * @param res
+	 * @param httpSession
+	 * @param sqlSession
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	public void confirmStatus(
+			HttpServletRequest req,
+			HttpServletResponse res,
+			HttpSession httpSession,
+			SqlSession sqlSession) throws ServletException, IOException {
+		logger.info("confirmStatus start");
+		service.fetchTaskLogic(req, httpSession, sqlSession);
+		service.sendTaskLogic(req, res, httpSession, sqlSession);
+		sqlSession.close();
+		logger.info("confirmStatus end");
 	}
 
 	/**

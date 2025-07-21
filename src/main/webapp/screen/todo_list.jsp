@@ -82,18 +82,21 @@
                         <%
                             for (TodoListDto todo : todoList) {
                         %>
-                            <tr>
-                                <td><input type="checkbox" class="row-check" value="<%= todo.getId() %>"/></td>
-                                <%-- <td><%= todo.getId() %></td> --%>
-                                <td><%= todo.getContent() %></td>
-                                <td><%= todo.getDueDate() %></td>
-                                <td class="todo-status">
-                                    <span class="todo-status-text"><%= todo.getStatus() %></span>
-                                    <button class="todo-status-btn" onclick="toggleStatus(this); submitChecked('status')" style="background: none; border: none; padding: 0;">
-                                    	<img src="<%= request.getContextPath()%>/svg/update.svg" width="14px" height="14px">
-                                    </button>
-                                </td>
-                            </tr>
+                        <tr>
+                          <td><input type="checkbox" class="row-check" value="<%= todo.getId() %>"/></td>
+                        
+                          <td id="content-<%= todo.getId() %>"><%= todo.getContent() %></td>
+                          <td id="dueDate-<%= todo.getId() %>"><%= todo.getDueDate() %></td>
+                        
+                          <td class="todo-status">
+                            <span class="todo-status-text" id="status-<%= todo.getId() %>"><%= todo.getStatus() %></span>
+                            <button class="todo-status-btn"
+                                    onclick="submitChecked('status', '<%= todo.getId() %>')"
+                                    style="background: none; border: none; padding: 0;">
+                              <img src="<%= request.getContextPath()%>/svg/update.svg" width="14px" height="14px">
+                            </button>
+                          </td>
+                        </tr>
                         <%
                             }
                         %>
@@ -216,55 +219,76 @@
     /**
     * アイコン押下時のSubmit
     */
-    function submitChecked(parm) {
+    function submitChecked(parm, ...updateTaskIds) {
          console.log(parm);
-         var checkboxes = document.querySelectorAll('.row-check');
-         var checked = Array.prototype.filter.call(checkboxes, function(cb) {
-           return cb.checked;
-         });
-         console.log(checked);
-
-         var checkedIds = checked.map(function(cb) { return cb.value; });
-         if (checkedIds.length === 0) {
-           alert("対象を選択してください");
-           return;
+         var paramStr = "";
+         if(updateTaskIds.length === 0){
+             var checkboxes = document.querySelectorAll('.row-check');
+             var checked = Array.prototype.filter.call(checkboxes, function(cb) {
+               return cb.checked;
+             });
+             console.log(checked);
+             var checkedIds = checked.map(function(cb) { return cb.value; });
+             if (checkedIds.length === 0) {
+               alert("対象を選択してください");
+               return;
+             }
+             if (parm === "delete") {
+                 if(!confirm('本当に削除しますか？')) return;
+             }
+             paramStr = "parm=" + parm + "&ids=" + checkedIds.join(",");
+         } else {
+             paramStr = "parm=" + parm + "&ids=" + updateTaskIds.join(",");
          }
-
-         if (parm === "delete") {
-             if(!confirm('本当に削除しますか？')) return;
-         } 
-
-         var paramStr = "parm=" + parm + "&ids=" + checkedIds.join(",");
          console.log(paramStr);
 
-         // 編集
+         // 編集画面遷移
          if (parm === "edit") {
-             window.open("/todo_application/todo_list?" + paramStr, "_blank", "width=600,height=400,resizable=yes");
-            // 例 /todo_application/todo_list?parm=edit&ids=38
+           window.open("/todo_application/todo_list?" + paramStr, "_blank", "width=600,height=400,resizable=yes");
 
-         // 削除・状態確認
+         // 削除 or ステータス更新
          } else if (parm === "delete" || parm === "status") {
-             var xhr = new XMLHttpRequest();
-             xhr.open("GET", "/todo_application/todo_list?" + paramStr, true);
-             xhr.onreadystatechange = function() {
-                 if (xhr.readyState === 4 && xhr.status === 200) {
-                     if (parm === "delete") {
-                         checked.forEach(function(cb) {
-                         var row = cb.closest("tr");
-                         if (row) row.remove();
-                         });
-                     } else if (parm === "status") {
-                         checked.forEach(function(cb) {
-                         var row = cb.closest("tr");
-                         var toggleBtn = row?.querySelector("button[onclick^='toggleStatus']");
-                         if (toggleBtn) {
-                             toggleStatus(toggleBtn);
-                           }
-                        });
-                     }
+           const xhr = new XMLHttpRequest();
+           xhr.open("GET", "/todo_application/todo_list?" + paramStr, true);
+
+           xhr.onreadystatechange = function () {
+             if (xhr.readyState === 4 && xhr.status === 200) {
+               if (parm === "delete") {
+                 // 削除：チェックされた行を削除
+                 checked.forEach(function (cb) {
+                   const row = cb.closest("tr");
+                   if (row) row.remove();
+                 });
+
+               } else if (parm === "status") {
+                 // ステータス更新：レスポンスを受け取ってDOM反映
+                 try {
+                   const response = JSON.parse(xhr.responseText);
+                   
+                   if (response.status === 200 && response.result === "OK") {
+                     const items = response.data.items;
+                     
+                     items.forEach(function (task) {
+                       const id = task.id;
+                       const contentTd = document.getElementById("content-" + id);
+                       const dueDateTd = document.getElementById("dueDate-" + id);
+                       const statusSpan = document.getElementById("status-" + id);
+                       if (contentTd) contentTd.innerText = task.content;
+                       if (dueDateTd) dueDateTd.innerText = task.dueDate;
+                       if (statusSpan) statusSpan.innerText = task.status;
+                     });
+                   } else {
+                     console.warn("APIレスポンスが失敗:", response);
+                   }
+                 } catch (e) {
+                   console.error("JSONパース失敗:", e);
+                   console.debug("生レスポンス:", xhr.responseText);
                  }
-             };
-             xhr.send();
+               }
+             }
+           };
+
+           xhr.send();
          }
      }
     </script>
