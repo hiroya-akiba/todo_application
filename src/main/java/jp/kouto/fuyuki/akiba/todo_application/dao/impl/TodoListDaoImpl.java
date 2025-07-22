@@ -52,7 +52,7 @@ public class TodoListDaoImpl implements TodoListDao {
 	 /**
 	  * @see todo_application.src.main.java.jp.kouto.fuyuki.akiba.todo_application.dao.TodoListDao#logicalDeleteTask
 	  */
-	 public void logicalDeleteTask(long userId, String contentId ,SqlSession session) throws RyzaDBException {
+	 public void logicalDeleteTask(long userId, List<String> contentId ,SqlSession session) throws RyzaDBException {
 		 try {
 			Map<String ,Object> params = new HashMap<>();
 			params.put("userId", userId);

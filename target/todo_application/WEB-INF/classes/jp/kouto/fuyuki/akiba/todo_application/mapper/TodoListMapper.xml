@@ -30,7 +30,11 @@
     <update id="logicalDeleteTask" parameterType="hashmap">
         UPDATE todo_lists
         SET deleted_date = NOW()
-        WHERE id = #{contentId} AND user_id = #{userId} 
+        WHERE user_id = #{userId}
+        AND id IN
+        <foreach collection="contentId" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
     </update>
     
     <!-- 指定のタスクを取得する -->

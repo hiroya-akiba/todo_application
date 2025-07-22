@@ -94,7 +94,7 @@ public class TodoListService {
 	public HttpServletRequest logicalDeleteLogic(HttpServletRequest req, HttpSession httpSession, SqlSession sqlSession) throws ServletException, IOException {
 		UsersDto user = (UsersDto) httpSession.getAttribute("user");
 		long userId = user.getId();
-		String contentId = req.getParameter("ids");
+		List<String> contentId = Arrays.asList(req.getParameter("ids").split(","));
 		TodoListDao dao = DaoFactory.getTodoListDao();
 		try {
 			dao.logicalDeleteTask(userId, contentId, sqlSession);
@@ -102,7 +102,6 @@ public class TodoListService {
 			httpSession.setAttribute("errorMessage", "タスク削除に失敗しました。問題が続く場合は管理者にお知らせください。");
 			logger.info("delete error",e);
 		}
-		
 		return req;
 	}
 	

@@ -38,7 +38,7 @@ public interface TodoListDao {
 	 * @param contentId
 	 * @throws RyzaDBException
 	 */
-	public void logicalDeleteTask(long userId, String contentId, SqlSession session) throws RyzaDBException;
+	public void logicalDeleteTask(long userId, List<String> contentId, SqlSession session) throws RyzaDBException;
 	
 	
 	/**

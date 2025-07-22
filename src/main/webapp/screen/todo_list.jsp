@@ -88,7 +88,7 @@
                         <%
                             for (TodoListDto todo : todoList) {
                         %>
-                        <tr>
+                        <tr id="row-<%= todo.getId() %>">
                           <td><input type="checkbox" class="row-check" value="<%= todo.getId() %>"/></td>
                         
                           <td id="content-<%= todo.getId() %>"><%= todo.getContent() %></td>
@@ -263,12 +263,12 @@
            xhr.onreadystatechange = function () {
              if (xhr.readyState === 4 && xhr.status === 200) {
                if (parm === "delete") {
-                 // 削除：チェックされた行を削除
-                 checked.forEach(function (cb) {
-                   const row = cb.closest("tr");
-                   if (row) row.remove();
+                   const idsToDelete = updateTaskIds.length === 0 ? checkedIds : updateTaskIds;
+                   idsToDelete.forEach(function (id) {
+                     const row = document.getElementById("row-" + id);
+                     console.log("target row:", row);
+                     if (row) row.remove();
                  });
-
                } else if (parm === "status") {
                  // ステータス更新：レスポンスを受け取ってDOM反映
                  try {
